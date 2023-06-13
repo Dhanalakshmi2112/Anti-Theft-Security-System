@@ -1,0 +1,195 @@
+Server connection code(NetBeans 8.2)
+Web.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
+http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+ <servlet>
+ <servlet-name>receive_ins</servlet-name>
+ <servlet-class>receive_ins</servlet-class>
+ </servlet>
+ <servlet>
+ <servlet-name>check_status</servlet-name>
+ <servlet-class>check_status</servlet-class>
+ </servlet>
+ <servlet>
+ <servlet-name>check_count</servlet-name>
+ <servlet-class>check_count</servlet-class>
+ </servlet>
+ <servlet-mapping>
+ <servlet-name>receive_ins</servlet-name>
+ <url-pattern>/receive_ins</url-pattern>
+ </servlet-mapping>
+ <servlet-mapping>
+ <servlet-name>check_status</servlet-name>
+ <url-pattern>/check_status</url-pattern>
+ </servlet-mapping>
+ <servlet-mapping>
+ <servlet-name>check_count</servlet-name>
+ <url-pattern>/check_count</url-pattern>
+ </servlet-mapping>
+ <session-config>
+ <session-timeout>
+ 30
+ </session-timeout>
+ </session-config>
+</web-app>
+
+Check_count.java
+/* To change this license header, choose License Headers in Project Properties. To change 
+this template file, choose Tools Templates and open the template in the editor. */
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+public class check_count extends HttpServlet {
+protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+ throws ServletException, IOException {
+ response.setContentType("text/html;charset=UTF-8");
+ try (PrintWriter out = response.getWriter()) {
+ File file = new 
+File("C:/Users/manur/Downloads/Home_Security_Hidden_Door_Web/count.txt"); 
+ FileReader fr=new FileReader(file);
+ BufferedReader br = new BufferedReader(fr); 
+ String st="",data=""; 
+ while ((st = br.readLine()) != null) 
+ {
+ System.out.println(st);
+ data=st;
+ }
+ br.close();
+ fr.close();
+ System.out.println("data="+data);
+ out.print(data);
+ }
+ }
+ @Override
+ protected void doGet(HttpServletRequest request, HttpServletResponse response)
+ throws ServletException, IOException {
+ processRequest(request, response);
+ @Override
+ protected void doPost(HttpServletRequest request, HttpServletResponse response)
+ throws ServletException, IOException {
+ processRequest(request, response);
+ }
+ @Override
+ public String getServletInfo() {
+ return "Short description";
+ }
+}
+
+Check_status.java
+/* To change this license header, choose License Headers in Project Properties. To change 
+this template file, choose Tools or Templates and open the template in the editor. */
+import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+public class check_status extends HttpServlet {
+ protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+ throws ServletException, IOException {
+ response.setContentType("text/html;charset=UTF-8");
+ try (PrintWriter out = response.getWriter()) {
+ out.println("<!DOCTYPE html>");
+ out.println("<html>");
+ out.println("<head>");
+ out.println("<title>Servlet check_status</title>"); 
+ out.println("</head>");
+ out.println("<body>");
+ out.println("<h1>Servlet check_status at " + request.getContextPath() + "</h1>");
+ out.println("</body>");
+ out.println("</html>");
+ }
+ }
+ @Override
+ protected void doGet(HttpServletRequest request, HttpServletResponse response)
+ throws ServletException, IOException {
+ processRequest(request, response);
+ }
+ @Override
+ protected void doPost(HttpServletRequest request, HttpServletResponse response)
+ throws ServletException, IOException {
+ processRequest(request, response);
+ }
+ @Override
+ public String getServletInfo() {
+ return "Short description";
+ }// </editor-fold>
+}
+
+
+Receive_ins.java
+/* To change this license header, choose License Headers in Project Properties. To change 
+this template file, choose Tools Templates and open the template in the editor. */
+import Logic.send_ins;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+public class receive_ins extends HttpServlet {
+ protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+ throws ServletException, IOException {
+ response.setContentType("text/html;charset=UTF-8");
+ try (PrintWriter out = response.getWriter()) {
+ /* TODO output your page here. You may use following sample code. */
+ String type=request.getParameter("type");
+ System.out.println("type"+type);
+ String status=request.getParameter("status");
+ System.out.println("status"+status);
+ if(type.equalsIgnoreCase("Buzzer") && status.equalsIgnoreCase("ON"))
+ {
+ send_ins si=new send_ins();
+ si.execute("buzzeron?");
+ }
+ if(type.equalsIgnoreCase("Buzzer") && status.equalsIgnoreCase("OFF"))
+ {
+ send_ins si=new send_ins();
+ si.execute("buzzeroff?");
+ }
+ if(type.equalsIgnoreCase("Light") && status.equalsIgnoreCase("ON"))
+ {
+ send_ins si=new send_ins();
+ si.execute("ledon?");
+ }
+ if(type.equalsIgnoreCase("Light") && status.equalsIgnoreCase("OFF"))
+ {
+ send_ins si=new send_ins();
+ si.execute("ledoff?");
+ }
+ if(type.equalsIgnoreCase("Hidden Door") && status.equalsIgnoreCase("ON"))
+ {
+ send_ins si=new send_ins();
+ si.execute("open?");
+ }
+ if(type.equalsIgnoreCase("Hidden Door") && status.equalsIgnoreCase("OFF"))
+ {
+ send_ins si=new send_ins();
+ si.execute("close?");
+ }
+ out.print("Instruction Sent");
+ }
+ }
+ // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on 
+the left to edit the code.">
+ @Override
+ protected void doGet(HttpServletRequest request, HttpServletResponse response)
+ throws ServletException, IOException {
+ processRequest(request, response);
+ }
+ @Override
+ protected void doPost(HttpServletRequest request, HttpServletResponse response)
+ throws ServletException, IOException {
+ processRequest(request, response);
+ }
+ @Override
+ public String getServletInfo() {
+ return "Short description";
+ }// </editor-fold>
+}

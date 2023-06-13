@@ -1,0 +1,30 @@
+Code to control the ESP32 CAM
+
+import requests
+import shutil
+import time
+from PIL import Image
+import numpy as np
+url = "http://192.168.220.218/capture"
+def download(fname):
+ file_name = fname#'1.png'
+ res = requests.get(url, stream = True)
+ if res.status_code == 200:
+ with open(file_name,'wb') as f:
+ shutil.copyfileobj(res.raw, f)
+ print('Image sucessfully Downloaded: ',file_name)
+shutil.copy(fname,'C:/Users/manur/Downloads/Home_Security_Hidden_Door_Web/web/'+fn
+ame)
+shutil.copy(fname,'C:/Users/manur/Downloads/Home_Security_Hidden_Door_Web/build/we
+b/'+fname)
+ else:
+ print('Image Couldn\'t be retrieved')
+c=0
+while True:
+ fname=str(c)+".png"
+ download(fname)
+ f=open("count.txt",'w')
+ f.write(str(c))
+ f.close()
+ c=c+1
+ time.sleep(5)

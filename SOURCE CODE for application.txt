@@ -1,0 +1,249 @@
+SOURCE CODE for application
+
+//Code for the application to operate the system
+ACTIVITY_MAIN.XML
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+ xmlns:app="http://schemas.android.com/apk/res-auto"
+ xmlns:tools="http://schemas.android.com/tools"
+ android:layout_width="match_parent"
+ android:layout_height="match_parent"
+ android:orientation="vertical"
+ android:background="#f1faee"
+ tools:context=".MainActivity"
+ >
+ <ImageView
+ android:id="@+id/iv"
+ android:layout_width="match_parent"
+ android:layout_height="325dp"
+ android:src="@drawable/aa" />
+ <Button
+ android:id="@+id/b"
+ android:layout_width="match_parent"
+ android:layout_height="wrap_content"
+ android:background="@color/purple_200"
+ android:text="Refresh" />
+ <AbsoluteLayout
+ android:layout_width="fill_parent"
+ android:layout_height="392dp">
+ <TextView
+ android:id="@+id/tv"
+ android:layout_width="match_parent"
+ android:layout_height="62dp"
+ android:layout_x="3dp"
+ANTI-THEFT SECURITY SYSTEM SUMMARY
+Dept of CSE, Vemana IT 54 2022-2023
+ android:textColor="@color/purple_200"
+ android:textStyle="bold"
+ android:layout_y="341dp"
+ android:text="Anti-theft security system" />
+ <Switch
+ android:id="@+id/switch1"
+ android:layout_width="wrap_content"
+ android:layout_height="wrap_content"
+ android:layout_x="165dp"
+ android:layout_y="143dp"
+ android:text="Lifght" />
+ <Switch
+ android:id="@+id/switch2"
+ android:layout_width="wrap_content"
+ android:layout_height="wrap_content"
+ android:layout_x="275dp"
+ android:layout_y="42dp"
+ android:text="Hidden Door" />
+ <Switch
+ android:id="@+id/switch3"
+ android:layout_width="wrap_content"
+ android:layout_height="wrap_content"
+ android:layout_x="28dp"
+ android:layout_y="39dp"
+ android:text="Buzzer" />
+ </AbsoluteLayout>
+</LinearLayout>
+//java code for the application to operate the system
+
+MAINACTIVITY.JAVA
+package com.example.home_security_hidden_door_app;
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.View;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.widget.Button;
+import java.net.URL;
+public class MainActivity extends AppCompatActivity {
+ TextView tv;
+ Switch s1,s2,s3;
+ int i1=0,i2=0,i3=0;
+ String status1="",status2="",status3="";
+ String type="",status="";
+ Button b1;
+ TextView tv1;
+ ImageView imageView;
+ String count="0",result="",res="";
+ @Override
+ protected void onCreate(Bundle savedInstanceState) {
+ super.onCreate(savedInstanceState);
+ setContentView(R.layout.activity_main);
+ tv=(TextView)findViewById(R.id.tv);
+ s1=(Switch)findViewById(R.id.switch1);
+ s2=(Switch)findViewById(R.id.switch2);
+ s3=(Switch)findViewById(R.id.switch3);
+ imageView = findViewById(R.id.iv);
+ b1 = findViewById(R.id.b);
+ s1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+ @Override
+ public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+ if(i1==0) {
+ i1=1;
+ status1="ON";
+ }
+ else{
+ i1=0;
+ status1="OFF";
+ }
+Toast.makeText(getApplicationContext(),status1+"",Toast.LENGTH_LONG).show();
+ type="Light";
+ status=status1;
+ new send_ins().execute();
+ }
+ });
+ s2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+ @Override
+ public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+ if(i2==0) {
+ i2=1;
+ status2="OFF";
+ }
+ else{
+ i2=0;
+ status2="ON";
+ }
+Toast.makeText(getApplicationContext(),status2+"",Toast.LENGTH_LONG).show();
+ type="Hidden Door";
+ status=status2;
+ new send_ins().execute();
+ }
+ });
+ s3.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+ @Override
+ public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+ if(i3==0) {
+ i3=1;
+ status3="ON";
+ }
+ else{
+ i3=0;
+ status3="OFF";
+ }
+Toast.makeText(getApplicationContext(),status3+"",Toast.LENGTH_LONG).show();
+ type="Buzzer";
+ status=status3;
+ new send_ins().execute();
+ }
+});
+ Picasso.with(getApplicationContext())
+ .load(Global.url+count+".png")
+ .into(imageView);
+ b1.setOnClickListener(new View.OnClickListener() {
+ @Override
+ public void onClick(View view) {
+ new check_count().execute();
+ }
+ });
+ }
+ class send_ins extends AsyncTask<String, Void, String> {
+ public void onPreExecute() {
+ }
+ public String doInBackground(String... args0) {
+ try {
+ URL url = new URL(Global.url + "receive_ins");
+ JSONObject json = new JSONObject();
+ json.put("type", type);
+ json.put("status", status);
+ String response = HttpClientConnection.HttpExecute(url, json);
+ return response;
+ } catch (Exception e) {
+ return new String("Exception: " + e.getMessage());
+ }
+ }
+ @Override
+ protected void onPostExecute(String msg) {
+ Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_LONG).show();
+ }
+ }
+ class check_count extends AsyncTask<String, Void, String> {
+ public void onPreExecute() {
+ }
+ public String doInBackground(String... args0) {
+ try {
+ URL url = new URL(Global.url + "check_count");
+ JSONObject json = new JSONObject();
+ String response = HttpClientConnection.HttpExecute(url, json);
+ return response;
+ } catch (Exception e) {
+ return new String("Exception: " + e.getMessage());
+ }
+ }
+ @Override
+ protected void onPostExecute(String msg) {
+ Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_LONG).show();
+ count=msg;
+ Picasso.with(getApplicationContext())
+ .load(Global.url+count+".png")
+ .into(imageView);
+ }
+ }
+ class get_result extends AsyncTask<Void, Void, String> {
+ @Override
+ protected String doInBackground(Void... voids) {
+ try {
+ URL url = new URL(Global.url + "check_status");
+ JSONObject jsn = new JSONObject();
+ String response =HttpClientConnection.HttpExecute(url, jsn);
+ res = response;
+ }
+ catch (MalformedURLException e) {
+ e.printStackTrace();
+ } catch (Exception e) {
+ e.printStackTrace();
+ }
+ return res;
+ }
+ @Override
+ protected void onPostExecute(String s) {
+ super.onPostExecute(s);
+ if(s.endsWith("null"))
+ {
+ s=s.substring(0,s.length()-4);
+ }
+ String arr[]=s.split("#");
+ }
+ }
+}
+
+
+ANDROIDMANIFEST.XML
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+ package="com.example.home_security_hidden_door_app">
+<uses-permission android:name="android.permission.INTERNET"/>
+ <application
+ android:allowBackup="true"
+ android:icon="@mipmap/ic_launcher"
+ android:label="Anti-Theft Security System"
+ android:roundIcon="@mipmap/ic_launcher_round"
+ android:supportsRtl="true"
+ android:networkSecurityConfig="@xml/network_security_config"
+ android:theme="@style/AppTheme">
+ <activity
+ android:name=".MainActivity"
+ android:exported="true">
+ <intent-filter>
+ <action android:name="android.intent.action.MAIN" />
+ <category android:name="android.intent.category.LAUNCHER" />
+ </intent-filter>
+ </activity>
+ </application>
+</manifest>

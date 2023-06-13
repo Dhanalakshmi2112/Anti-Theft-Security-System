@@ -1,0 +1,90 @@
+Control_servo.java
+package Logic;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+public class control_servo extends Thread 
+{
+ public control_servo(){
+ start();
+ }
+ public void run()
+ {
+ send_ins si=new send_ins();
+ while(true){
+ try{
+ si.execute("sensorData?");
+ }catch(Exception e)
+ {
+ e.printStackTrace();
+ }
+ try {
+ Thread.sleep(2000);
+ } catch (InterruptedException ex) {
+ Logger.getLogger(control_servo.class.getName()).log(Level.SEVERE, null, ex);
+ }
+ }
+ }
+ public static void main(String[] args) {
+ new control_servo();
+ }
+}
+Send_ins.java
+package Logic;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+public class send_ins {
+ public static void main(String[] args) {
+ try {
+URL url = new URL("http://192.168.220.72/ledon?");
+HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+conn.setRequestMethod("GET");
+conn.setRequestProperty("Accept", "application/json");
+if (conn.getResponseCode() != 200) {
+throw new RuntimeException("Failed : HTTP error code : "
++ conn.getResponseCode());
+}
+BufferedReader br = new BufferedReader(new InputStreamReader(
+(conn.getInputStream())));
+String output;
+System.out.println("Output from Server .... \n");
+while ((output = br.readLine()) != null) {
+System.out.println(output);
+}
+conn.disconnect();
+ } catch (MalformedURLException e) {
+e.printStackTrace();
+ } catch (IOException e) {
+e.printStackTrace();
+ }
+ }
+ public String execute(String cmd)
+ {
+ String response="";
+ try {
+URL url = new URL("http://192.168.220.72/"+cmd);
+HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+conn.setRequestMethod("GET");
+conn.setRequestProperty("Accept", "application/json");
+if (conn.getResponseCode() != 200) {
+throw new RuntimeException("Failed : HTTP error code : "
++ conn.getResponseCode());
+}
+BufferedReader br = new BufferedReader(new InputStreamReader(
+(conn.getInputStream())));
+String output;
+System.out.println("Output from Server .... \n");
+while ((output = br.readLine()) != null) {
+System.out.println(output);
+}
+ response=output;
+conn.disconnect();
+ } catch (MalformedURLException e) {
+e.printStackTrace();
+ } catch (IOException e) {
+e.printStackTrace();
+ }
+ return response;
+ }
+}
