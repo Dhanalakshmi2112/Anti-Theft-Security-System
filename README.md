@@ -10,4 +10,5 @@ Later, with the help of ESP32 CAM the photo is captured.
 The application was designed to control the actions such Buzzer, lights, Hidden door and along with live stream of the captured photo . 
 The user can control the actions with the help of switch in the application.
 The proposed system is cost-effective, efficient, and easy to install and operate.
+
 Key Words: PI Pico W, Piezo Sensor, Servo Motor, ESP 32 CAM, Hidden-door
